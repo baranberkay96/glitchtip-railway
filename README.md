@@ -1,5 +1,7 @@
 # Deploy and Host GlitchTip with Railway
 
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/glitchtip-7-error-tracking-sentry-compat?referralCode=20H68q)
+
 GlitchTip is open-source (MIT) error tracking that accepts events from the Sentry SDKs, plus performance monitoring, uptime checks and logs. This community template runs GlitchTip 7 with PostgreSQL 18, Valkey for the task queue and cache, a Railway Bucket for uploaded source maps and debug files, and a superuser created on the first start.
 
 ## About Hosting GlitchTip
