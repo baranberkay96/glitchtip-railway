@@ -1,0 +1,288 @@
+{
+  "name": "GlitchTip 7 Error Tracking (Sentry-Compatible)",
+  "idSeed": "GlitchTip 7 Error Tracking (Sentry-Compatible)",
+  "description": "Sentry-compatible errors, performance and uptime monitoring.",
+  "category": "Observability",
+  "tags": [
+    "glitchtip",
+    "sentry",
+    "error-tracking",
+    "apm",
+    "uptime-monitoring",
+    "observability",
+    "postgres",
+    "valkey"
+  ],
+  "image": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/glitchtip.svg",
+  "upstream": {
+    "repo": "gitlab.com/glitchtip/glitchtip-backend",
+    "version": "v7.0.0",
+    "image": "glitchtip/glitchtip:7.0.0@sha256:c245745b4179667da3aebd73fb8d4f1fd918f7d68ba07d1fd73ea688933b6e01",
+    "checked": "2026-11-20"
+  },
+  "services": {
+    "GlitchTip": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/glitchtip.svg",
+      "source": {
+        "repo": "baranberkay96/glitchtip-railway",
+        "rootDirectory": "/services/glitchtip"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": "/_health/",
+      "healthcheckTimeout": 900,
+      "restartPolicyType": "ALWAYS",
+      "restartPolicyMaxRetries": null,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": true,
+      "targetPort": 8000,
+      "tcpProxy": null,
+      "volume": null,
+      "variables": {
+        "PORT": {
+          "defaultValue": "8000",
+          "description": "HTTP port of the web app, API and event ingest (public domain target and healthcheck).",
+          "required": false
+        },
+        "GRANIAN_HOST": {
+          "defaultValue": "::",
+          "description": "Listen address (:: = IPv4 and IPv6, for apps sending events over the private network).",
+          "required": false
+        },
+        "GLITCHTIP_DOMAIN": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Public URL used in DSNs, links and e-mails. Change it when you add a custom domain.",
+          "required": false
+        },
+        "CSRF_TRUSTED_ORIGINS": {
+          "defaultValue": "https://${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Origins allowed to submit forms (comma-separated). Add your custom domain here too.",
+          "required": false
+        },
+        "SECRET_KEY": {
+          "defaultValue": "${{secret(64, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Django secret key (sessions, tokens). Changing it signs everyone out.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "${{Postgres.DATABASE_URL}}",
+          "description": "PostgreSQL over the private network. Migrations run on every start.",
+          "required": false
+        },
+        "VALKEY_URL": {
+          "defaultValue": "${{Valkey.REDIS_URL}}",
+          "description": "Valkey for cache and the task queue.",
+          "required": false
+        },
+        "GLITCHTIP_ADMIN_EMAIL": {
+          "defaultValue": "admin@example.com",
+          "description": "Login e-mail of the first superuser, created on the first start. Change it before deploying or later in Profile.",
+          "required": false
+        },
+        "GLITCHTIP_ADMIN_PASSWORD": {
+          "defaultValue": "${{secret(24, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789\")}}",
+          "description": "Password of the first superuser (8-128 chars). Generated; read it here to log in.",
+          "required": false
+        },
+        "GLITCHTIP_ADMIN_RESET_PASSWORD": {
+          "defaultValue": "false",
+          "description": "true = on the next start, set the password of GLITCHTIP_ADMIN_EMAIL to GLITCHTIP_ADMIN_PASSWORD. Set back to false afterwards.",
+          "required": false
+        },
+        "ENABLE_USER_REGISTRATION": {
+          "defaultValue": "false",
+          "description": "false = only invited users can sign up. true = anyone who reaches the site can register.",
+          "required": false
+        },
+        "ENABLE_ORGANIZATION_CREATION": {
+          "defaultValue": "false",
+          "description": "false = only superusers create organizations.",
+          "required": false
+        },
+        "GLITCHTIP_RETENTION_DAYS": {
+          "defaultValue": "90",
+          "description": "Delete events, transactions and logs older than this many days.",
+          "required": false
+        },
+        "DEFAULT_FROM_EMAIL": {
+          "defaultValue": "glitchtip@${{RAILWAY_PUBLIC_DOMAIN}}",
+          "description": "Sender address once e-mail is configured (see README: EMAIL_URL or an HTTP provider).",
+          "required": false
+        },
+        "AWS_ACCESS_KEY_ID": {
+          "defaultValue": "${{Bucket.ACCESS_KEY_ID}}",
+          "description": "Railway Bucket access key (uploaded source maps and debug files).",
+          "required": false
+        },
+        "AWS_SECRET_ACCESS_KEY": {
+          "defaultValue": "${{Bucket.SECRET_ACCESS_KEY}}",
+          "description": "Railway Bucket secret key.",
+          "required": false
+        },
+        "AWS_STORAGE_BUCKET_NAME": {
+          "defaultValue": "${{Bucket.BUCKET}}",
+          "description": "Railway Bucket name.",
+          "required": false
+        },
+        "AWS_S3_ENDPOINT_URL": {
+          "defaultValue": "${{Bucket.ENDPOINT}}",
+          "description": "Railway Bucket S3 endpoint.",
+          "required": false
+        },
+        "AWS_DEFAULT_REGION": {
+          "defaultValue": "${{Bucket.REGION}}",
+          "description": "Railway Bucket region (read by boto3).",
+          "required": false
+        },
+        "GRANIAN_WORKERS": {
+          "defaultValue": "1",
+          "description": "Server processes per replica. Each also runs task workers; raise with RAM, or add replicas.",
+          "required": false
+        },
+        "LOG_LEVEL": {
+          "defaultValue": "INFO",
+          "description": "Log level.",
+          "required": false
+        }
+      }
+    },
+    "Postgres": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/postgresql.svg",
+      "source": {
+        "image": "ghcr.io/railwayapp-templates/postgres-ssl:18"
+      },
+      "startCommand": null,
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ON_FAILURE",
+      "restartPolicyMaxRetries": 10,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/var/lib/postgresql/data"
+      },
+      "variables": {
+        "POSTGRES_USER": {
+          "defaultValue": "postgres",
+          "description": "Database superuser.",
+          "required": false
+        },
+        "POSTGRES_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Database password (generated).",
+          "required": false
+        },
+        "POSTGRES_DB": {
+          "defaultValue": "railway",
+          "description": "Database created on the first start.",
+          "required": false
+        },
+        "PGDATA": {
+          "defaultValue": "/var/lib/postgresql/data/pgdata",
+          "description": "Data directory inside the volume.",
+          "required": false
+        },
+        "PGHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Private hostname of this database.",
+          "required": false
+        },
+        "PGPORT": {
+          "defaultValue": "5432",
+          "description": "Database port.",
+          "required": false
+        },
+        "PGUSER": {
+          "defaultValue": "${{POSTGRES_USER}}",
+          "description": "Used by Railway's Data tab.",
+          "required": false
+        },
+        "PGPASSWORD": {
+          "defaultValue": "${{POSTGRES_PASSWORD}}",
+          "description": "Used by Railway's Data tab.",
+          "required": false
+        },
+        "PGDATABASE": {
+          "defaultValue": "${{POSTGRES_DB}}",
+          "description": "Used by Railway's Data tab.",
+          "required": false
+        },
+        "DATABASE_URL": {
+          "defaultValue": "postgresql://${{PGUSER}}:${{POSTGRES_PASSWORD}}@${{RAILWAY_PRIVATE_DOMAIN}}:5432/${{PGDATABASE}}",
+          "description": "Private connection URL used by GlitchTip.",
+          "required": false
+        },
+        "RAILWAY_DEPLOYMENT_DRAINING_SECONDS": {
+          "defaultValue": "60",
+          "description": "Lets Postgres shut down cleanly on redeploy.",
+          "required": false
+        },
+        "SSL_CERT_DAYS": {
+          "defaultValue": "820",
+          "description": "SSL certificate expiry in days.",
+          "required": false
+        }
+      }
+    },
+    "Valkey": {
+      "icon": "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/svg/valkey.svg",
+      "source": {
+        "image": "valkey/valkey:9.2.0-alpine@sha256:c8e2d17498838af5d91e12eb7c11220b3434a7b7131a333e3af52ad5e0b80882"
+      },
+      "startCommand": "/bin/sh -c \"rm -rf $RAILWAY_VOLUME_MOUNT_PATH/lost+found/ && exec docker-entrypoint.sh valkey-server --requirepass $REDIS_PASSWORD --appendonly yes --save 60 1 --maxmemory-policy noeviction --dir $RAILWAY_VOLUME_MOUNT_PATH\"",
+      "preDeployCommand": null,
+      "healthcheckPath": null,
+      "healthcheckTimeout": null,
+      "restartPolicyType": "ALWAYS",
+      "restartPolicyMaxRetries": null,
+      "numReplicas": 1,
+      "cronSchedule": null,
+      "publicDomain": false,
+      "targetPort": null,
+      "tcpProxy": null,
+      "volume": {
+        "mountPath": "/data"
+      },
+      "variables": {
+        "REDISHOST": {
+          "defaultValue": "${{RAILWAY_PRIVATE_DOMAIN}}",
+          "description": "Private hostname of Valkey.",
+          "required": false
+        },
+        "REDISPORT": {
+          "defaultValue": "6379",
+          "description": "Valkey port.",
+          "required": false
+        },
+        "REDISUSER": {
+          "defaultValue": "default",
+          "description": "Valkey user.",
+          "required": false
+        },
+        "REDIS_PASSWORD": {
+          "defaultValue": "${{ secret(32, \"abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ\") }}",
+          "description": "Valkey password (generated).",
+          "required": false
+        },
+        "REDISPASSWORD": {
+          "defaultValue": "${{REDIS_PASSWORD}}",
+          "description": "Alias of REDIS_PASSWORD.",
+          "required": false
+        },
+        "REDIS_URL": {
+          "defaultValue": "redis://${{ REDISUSER }}:${{ REDIS_PASSWORD }}@${{ REDISHOST }}:${{ REDISPORT }}",
+          "description": "Private connection URL used by GlitchTip (cache and task queue).",
+          "required": false
+        }
+      }
+    }
+  },
+  "buckets": [
+    "Bucket"
+  ]
+}
